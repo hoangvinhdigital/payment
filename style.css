@@ -1,0 +1,594 @@
+/* ===== BIẾN VÀ CÀI ĐẶT CHUNG ===== */
+:root {
+    --primary-green: #2e7d32;
+    --primary-green-light: #4caf50;
+    --dark-text: #212121;
+    --light-text: #757575;
+    --border-color: #e0e0e0;
+    --bg-light: #f5f5f5;
+    --bg-white: #ffffff;
+    --status-red: #d32f2f;
+    --status-green: #388e3c;
+    --font-main: 'Be Vietnam Pro', sans-serif;
+    --font-mono: 'Roboto Mono', monospace;
+    /* Thêm màu cho icon */
+    --bank-color: #0070e0; /* Màu MB Bank */
+    --zalo-color: #0084ff; /* Màu Zalo */
+    --momo-color: #ae2070; /* Màu Momo */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-light);
+    color: var(--dark-text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+/* ===== KHUNG MÁY THANH TOÁN ===== */
+.payment-machine {
+    width: 100%;
+    max-width: 450px;
+    background: var(--bg-white);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== ĐẦU MÁY (STEP) ===== */
+.machine-header {
+    background: var(--bg-white);
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.step-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-basis: 33.33%;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--light-text);
+    position: relative;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--border-color);
+    transform: translateX(15px);
+    z-index: 1;
+}
+
+.step-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--border-color);
+    color: var(--light-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.step-item.active .step-circle,
+.step-item.completed .step-circle {
+    background: var(--primary-green);
+    color: white;
+}
+
+.step-item.active span {
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+.step-item.completed span {
+    color: var(--dark-text);
+}
+
+.step-item.completed::after {
+    background: var(--primary-green);
+}
+
+/* ===== THÂN MÁY (CÁC BƯỚC) ===== */
+.machine-body {
+    padding: 1.5rem;
+}
+
+.step {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.step.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    color: var(--dark-text);
+}
+
+/* ===== BƯỚC 1: CHỌN LOẠI ===== */
+.payment-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.option-card {
+    background: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-card:hover {
+    border-color: var(--primary-green-light);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.option-card.active {
+    border-color: var(--primary-green);
+    background: #f1f8e9;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+}
+
+.option-card i {
+    font-size: 1.5rem;
+    color: var(--primary-green);
+    margin-bottom: 0.5rem;
+}
+
+.option-card span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.option-card strong {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+.input-group {
+    margin-top: 1rem;
+    animation: fadeIn 0.3s;
+}
+.input-group.hidden {
+    display: none;
+}
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 500;
+    transition: border-color 0.3s;
+}
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+}
+
+/* ===== BƯỚC 2: CHỌN TÀI KHOẢN ===== */
+.account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.account-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.account-item input[type="radio"] {
+    display: none;
+}
+.account-item:has(input:checked) {
+    border-color: var(--primary-green);
+    background: #f1f8e9;
+}
+.account-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* ===== THAY ĐỔI Ở ĐÂY (thay <img> bằng <i>) ===== */
+.account-icon {
+    font-size: 1.8rem; /* ~30px */
+    width: 30px;
+    text-align: center;
+}
+.bank-icon { color: var(--bank-color); }
+.wallet-icon-zalo { color: var(--zalo-color); }
+.wallet-icon-momo { color: var(--momo-color); }
+/* ============================================= */
+
+.account-info div {
+    display: flex;
+    flex-direction: column;
+}
+.account-info strong {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+.account-info span {
+    font-size: 0.8rem;
+    color: var(--light-text);
+    font-family: var(--font-mono);
+}
+.status-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.status-badge.active {
+    background-color: #e8f5e9;
+    color: var(--status-green);
+}
+.status-badge.inactive {
+    background-color: #ffebee;
+    color: var(--status-red);
+}
+.account-item.disabled {
+    opacity: 0.6;
+    background: var(--bg-light);
+    cursor: not-allowed;
+}
+
+/* ===== BƯỚC 3: HÓA ĐƠN ===== */
+.receipt-paper {
+    background: var(--bg-white);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.receipt-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+}
+.receipt-header i {
+    font-size: 1.5rem;
+    color: var(--primary-green);
+}
+.receipt-header strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+}
+.receipt-details {
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+.receipt-details li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px dotted var(--light-text);
+}
+.receipt-details li.total {
+    padding-top: 0.75rem;
+    font-size: 1rem;
+}
+.receipt-details li.total strong {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+.receipt-divider {
+    height: 1px;
+    border-top: 1px dashed var(--light-text);
+    margin: 1rem 0;
+}
+
+.receipt-account {
+    text-align: center;
+}
+.receipt-account h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    color: var(--light-text);
+}
+
+/* ===== THAY ĐỔI Ở ĐÂY (thay <img> bằng <i>) ===== */
+.receipt-account #receipt-bank-icon {
+    font-size: 2rem; /* 32px */
+    margin-bottom: 0.75rem;
+    display: inline-block; /* Để căn giữa */
+    transition: color 0.3s ease;
+}
+/* ============================================= */
+
+.receipt-account #receipt-bank-name {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+.receipt-account #receipt-account-owner {
+    display: block;
+    font-size: 0.9rem;
+    font-family: var(--font-mono);
+    color: var(--light-text);
+    margin-bottom: 0.75rem;
+}
+.account-number-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #e8f5e9;
+    border: 1px dashed var(--primary-green);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+.account-number-box strong {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--primary-green);
+}
+.account-number-box button {
+    margin-left: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--primary-green);
+    cursor: pointer;
+}
+
+.memo-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+.memo-box strong {
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--status-red);
+}
+.memo-box button {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    color: var(--light-text);
+    cursor: pointer;
+}
+
+.receipt-qr {
+    text-align: center;
+    margin-top: 1rem;
+}
+.receipt-qr img {
+    width: 100%;
+    max-width: 280px; 
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin: 0 auto 0.5rem auto; 
+    display: block; 
+}
+.receipt-qr small {
+    font-size: 0.8rem;
+    color: var(--light-text);
+}
+
+#qr-not-available {
+    max-width: 280px; 
+    height: 280px; 
+    width: 100%;
+    margin: 0 auto 0.5rem auto;
+    border-radius: 8px;
+    border: 2px dashed var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #fafafa;
+    color: var(--light-text);
+}
+#qr-not-available i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+#qr-not-available p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 1rem;
+}
+
+/* ===== NÚT BẤM CHUNG ===== */
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+.nav-buttons-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: var(--font-main);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+.btn i {
+    margin: 0 0.25rem;
+}
+
+.btn-primary {
+    background: var(--primary-green);
+    color: white;
+}
+.btn-primary:hover {
+    background: var(--primary-green-light);
+}
+
+.btn-secondary {
+    background: #f1f1f1;
+    color: var(--dark-text);
+    border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+    background: #e7e7e7;
+}
+
+.btn-confirm {
+    background: var(--primary-green-light);
+    color: white;
+    font-size: 1rem;
+    padding: 1rem;
+}
+.btn-confirm:hover {
+    background: var(--primary-green);
+}
+.btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* ===== FOOTER MÁY ===== */
+.machine-footer {
+    background: #fafafa;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+    text-align: center;
+}
+.machine-footer p {
+    font-size: 0.8rem;
+    color: var(--light-text);
+    margin: 0.25rem 0;
+}
+.machine-footer a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* ===== TIỆN ÍCH ===== */
+.hidden {
+    display: none !important;
+}
+
+.error-message {
+    font-size: 0.9rem;
+    color: var(--status-red);
+    font-weight: 500;
+    margin-top: 0.75rem;
+    text-align: center;
+}
+
+/* THÔNG BÁO TOAST */
+#toast-notification {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 100;
+    transition: bottom 0.5s ease;
+}
+#toast-notification.show {
+    bottom: 30px;
+}
