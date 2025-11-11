@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Thanh Toán - HoangVinh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #4caf50;
+            --accent: #1b5e20;
+            --light: #f5f6fa;
+            --dark: #263238;
+            --success: #00c853;
+            --danger: #ff5252;
+            --warning: #ff9800;
+            --receipt-bg: #fff;
+            --receipt-border: #ddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f4f8;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 10px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #9e9e9e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step.active .step-number {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step-text {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #9e9e9e;
+        }
+
+        .step.active .step-text {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Receipt Style */
+        .receipt {
+            background: var(--receipt-bg);
+            border-radius: 12px;
+            padding: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--receipt-border);
+            overflow: hidden;
+        }
+
+        .receipt-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .receipt-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .receipt-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .receipt-body {
+            padding: 20px;
+        }
+
+        /* Payment Selection */
+        .payment-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+        }
+
+        .payment-option.active {
+            border-color: var(--primary);
+            background-color: rgba(46, 125, 50, 0.05);
+        }
+
+        .payment-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+
+        .payment-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .payment-desc {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .amount-input-container {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .amount-input-container.active {
+            display: block;
+        }
+
+        .amount-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .amount-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+
+        /* Bank Selection */
+        .bank-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .bank-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bank-option:hover {
+            border-color: var(--primary);
+        }
+
+        .bank-option.active {
+            border-color: var(--primary);
+            background-color: rgba(46, 125, 50, 0.05);
+        }
+
+        .bank-option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+
+        .bank-option.disabled:hover {
+            border-color: #e0e0e0;
+        }
+
+        .bank-icon {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .bank-option.disabled .bank-icon {
+            color: #9e9e9e;
+        }
+
+        .bank-info {
+            flex: 1;
+        }
+
+        .bank-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--dark);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bank-option.disabled .bank-name {
+            color: #9e9e9e;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-inactive {
+            background: var(--danger);
+            color: white;
+        }
+
+        .status-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .account-details {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .bank-option.disabled .account-details {
+            color: #9e9e9e;
+        }
+
+        /* Invoice Section */
+        .invoice-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px dashed #ddd;
+            text-align: center;
+        }
+
+        .invoice-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .invoice-subtitle {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .invoice-body {
+            padding: 15px;
+        }
+
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .invoice-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .invoice-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .selected-bank {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .bank-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .bank-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .bank-value {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn-small {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 3px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn-small:hover {
+            background: rgba(46, 125, 50, 0.1);
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .no-qr-message {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        .qr-code {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 8px;
+            background: white;
+        }
+
+        .qr-note {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .primary-btn:hover {
+            background: var(--accent);
+        }
+
+        .secondary-btn {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(46, 125, 50, 0.1);
+        }
+
+        .success-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+        }
+
+        .success-btn:hover {
+            background: #00b344;
+        }
+
+        .copy-notification {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .support-info {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .support-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .support-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .support-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        .support-note {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.7rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="copy-notification" id="copyNotification">
+        <i class="fas fa-check-circle"></i> Đã sao chép!
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-receipt logo-icon"></i>
+                <div class="logo-text">Hệ Thống Thanh Toán</div>
+            </div>
+            <p class="tagline">Hoàn tất thanh toán trong 3 bước đơn giản</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-text">Chọn thanh toán</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-text">Chọn tài khoản</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-text">Hóa đơn</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Payment Selection -->
+        <div class="receipt section active" id="paymentSection">
+            <div class="receipt-header">
+                <div class="receipt-title">BƯỚC 1: CHỌN LOẠI THANH TOÁN</div>
+                <div class="receipt-subtitle">Chọn loại thanh toán bạn muốn thực hiện</div>
+            </div>
+            <div class="receipt-body">
+                <div class="payment-selection">
+                    <div class="payment-option active" data-type="locket-gold" data-amount="30000">
+                        <div class="payment-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="payment-name">Locket Gold</div>
+                        <div class="payment-desc">30,000 VND</div>
+                    </div>
+                    <div class="payment-option" data-type="free">
+                        <div class="payment-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="payment-name">Thanh Toán Tự Do</div>
+                        <div class="payment-desc">Nhập số tiền tùy ý</div>
+                    </div>
+                    <div class="payment-option" data-type="crypto" data-amount="500000">
+                        <div class="payment-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="payment-name">Nạp Tiền Điện Tử</div>
+                        <div class="payment-desc">500,000 VND</div>
+                    </div>
+                    <div class="payment-option" data-type="other" data-amount="0">
+                        <div class="payment-icon">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                        <div class="payment-name">Giao Dịch Khác</div>
+                        <div class="payment-desc">Liên hệ hỗ trợ</div>
+                    </div>
+                </div>
+                
+                <div class="amount-input-container" id="amount-input-container">
+                    <label class="amount-label" for="amount-input">Nhập số tiền (VND):</label>
+                    <input type="number" id="amount-input" class="amount-input" placeholder="Ví dụ: 50000" min="1000" step="1000">
+                </div>
+                
+                <button class="action-btn primary-btn" id="toBankStepBtn">
+                    <i class="fas fa-arrow-right"></i> TIẾP TỤC CHỌN TÀI KHOẢN
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Bank Selection -->
+        <div class="receipt section" id="bankSection">
+            <div class="receipt-header">
+                <div class="receipt-title">BƯỚC 2: CHỌN TÀI KHOẢN NGÂN HÀNG</div>
+                <div class="receipt-subtitle">Chọn tài khoản bạn muốn sử dụng để thanh toán</div>
+            </div>
+            <div class="receipt-body">
+                <div class="bank-options">
+                    <div class="bank-option active" data-bank="mbbank" data-account="090695" data-name="NGUYEN HOANG VINH" data-branch="HÀ NỘI">
+                        <i class="fas fa-university bank-icon"></i>
+                        <div class="bank-info">
+                            <div class="bank-name">
+                                MB BANK - TÀI KHOẢN CHÍNH
+                                <span class="status-badge status-active">ĐANG HOẠT ĐỘNG</span>
+                            </div>
+                            <div class="account-details">Số TK: 090695 - NGUYEN HOANG VINH</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-option" data-bank="mbbank" data-account="596783" data-name="NGUYEN HOANG VINH" data-branch="HÀ NỘI">
+                        <i class="fas fa-university bank-icon"></i>
+                        <div class="bank-info">
+                            <div class="bank-name">
+                                MB BANK - TÀI KHOẢN DỰ PHÒNG
+                                <span class="status-badge status-active">ĐANG HOẠT ĐỘNG</span>
+                            </div>
+                            <div class="account-details">Số TK: 596783 - NGUYEN HOANG VINH</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-option" data-bank="zalopay" data-account="0397772987" data-name="NGUYEN HOANG VINH" data-branch="">
+                        <i class="fas fa-wallet bank-icon"></i>
+                        <div class="bank-info">
+                            <div class="bank-name">
+                                ZALO PAY
+                                <span class="status-badge status-active">ĐANG HOẠT ĐỘNG</span>
+                            </div>
+                            <div class="account-details">Số ĐT: 0397772987 - NGUYEN HOANG VINH</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-option disabled" data-bank="momo" data-account="0397772987" data-name="NGUYEN HOANG VU DUY" data-branch="">
+                        <i class="fas fa-mobile-alt bank-icon"></i>
+                        <div class="bank-info">
+                            <div class="bank-name">
+                                VÍ MOMO
+                                <span class="status-badge status-inactive">DỪNG HOẠT ĐỘNG</span>
+                            </div>
+                            <div class="account-details">Số ĐT: 0397772987 - NGUYEN HOANG VU DUY</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn secondary-btn" id="backToPaymentBtn">
+                        <i class="fas fa-arrow-left"></i> QUAY LẠI
+                    </button>
+                    <button class="action-btn primary-btn" id="toInvoiceStepBtn">
+                        <i class="fas fa-receipt"></i> XEM HÓA ĐƠN
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Invoice -->
+        <div class="receipt section" id="invoiceSection">
+            <div class="receipt-header">
+                <div class="receipt-title">BƯỚC 3: HÓA ĐƠN THANH TOÁN</div>
+                <div class="receipt-subtitle">Thông tin chuyển khoản của bạn</div>
+            </div>
+            <div class="invoice-header">
+                <div class="invoice-title">THÔNG TIN GIAO DỊCH</div>
+                <div class="invoice-subtitle" id="transaction-type">Locket Gold</div>
+            </div>
+            <div class="invoice-body">
+                <div class="invoice-row">
+                    <div class="invoice-label">Mã giao dịch:</div>
+                    <div class="invoice-value" id="transaction-id">#HV2023001</div>
+                </div>
+                <div class="invoice-row">
+                    <div class="invoice-label">Thời gian:</div>
+                    <div class="invoice-value" id="transaction-time">01/12/2023 10:30</div>
+                </div>
+                <div class="invoice-row">
+                    <div class="invoice-label">Số tiền:</div>
+                    <div class="invoice-value" id="invoice-amount">30,000 VND</div>
+                </div>
+                <div class="invoice-row">
+                    <div class="invoice-label">Nội dung:</div>
+                    <div class="invoice-value" id="invoice-content">LKGold_0397772987</div>
+                </div>
+                
+                <div class="selected-bank">
+                    <div class="invoice-title" style="text-align: left; margin-bottom: 10px;">TÀI KHOẢN ĐÃ CHỌN</div>
+                    
+                    <div class="bank-details">
+                        <div class="bank-label">Ngân hàng:</div>
+                        <div class="bank-value" id="selected-bank-name">MB BANK - TÀI KHOẢN CHÍNH</div>
+                    </div>
+                    <div class="bank-details">
+                        <div class="bank-label">Số tài khoản:</div>
+                        <div class="bank-value" id="selected-account">090695</div>
+                    </div>
+                    <div class="bank-details">
+                        <div class="bank-label">Chủ tài khoản:</div>
+                        <div class="bank-value" id="selected-account-name">NGUYEN HOANG VINH</div>
+                    </div>
+                    <div class="bank-details">
+                        <div class="bank-label">Chi nhánh:</div>
+                        <div class="bank-value" id="selected-branch">HÀ NỘI</div>
+                    </div>
+                    
+                    <button class="action-btn primary-btn" id="copyAccountBtn" style="margin-top: 10px;">
+                        <i class="fas fa-copy"></i> SAO CHÉP SỐ TÀI KHOẢN
+                    </button>
+                </div>
+                
+                <div class="qr-section" id="qr-section">
+                    <div class="qr-code" id="qr-code">
+                        <!-- QR Code will be generated here -->
+                    </div>
+                    <div class="no-qr-message" id="no-qr-message" style="display: none;">
+                        <i class="fas fa-info-circle"></i> Mã QR không khả dụng cho Zalo Pay. Vui lòng chuyển khoản thủ công.
+                    </div>
+                    <p class="qr-note">
+                        Quét mã QR để tự động điền thông tin chuyển khoản
+                    </p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn secondary-btn" id="backToBankBtn">
+                        <i class="fas fa-arrow-left"></i> QUAY LẠI
+                    </button>
+                    <button class="action-btn success-btn" id="paidBtn">
+                        <i class="fas fa-check-circle"></i> ĐÃ THANH TOÁN
+                    </button>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn primary-btn" id="newTransactionBtn" style="flex: 1;">
+                        <i class="fas fa-redo"></i> GIAO DỊCH MỚI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="support-info">
+            <div class="support-title">HỖ TRỢ KHÁCH HÀNG</div>
+            <div class="support-detail">
+                <div class="support-item">
+                    <i class="fas fa-phone-alt" style="color: var(--primary);"></i>
+                    <span>Hotline: <strong>0397 772 987</strong></span>
+                </div>
+                <div class="support-item">
+                    <i class="fas fa-envelope" style="color: var(--primary);"></i>
+                    <span>Email: <strong>honagvinh09062008@gmail.com</strong></span>
+                </div>
+            </div>
+            <p class="support-note">Liên hệ ngay nếu bạn cần hỗ trợ trong quá trình thanh toán</p>
+        </div>
+
+        <div class="footer">
+            &copy; 2023 Hệ Thống Thanh Toán HoangVinh. Tất cả các quyền được bảo lưu.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const paymentSection = document.getElementById('paymentSection');
+            const bankSection = document.getElementById('bankSection');
+            const invoiceSection = document.getElementById('invoiceSection');
+            
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            
+            const toBankStepBtn = document.getElementById('toBankStepBtn');
+            const backToPaymentBtn = document.getElementById('backToPaymentBtn');
+            const toInvoiceStepBtn = document.getElementById('toInvoiceStepBtn');
+            const backToBankBtn = document.getElementById('backToBankBtn');
+            const newTransactionBtn = document.getElementById('newTransactionBtn');
+            const copyAccountBtn = document.getElementById('copyAccountBtn');
+            const paidBtn = document.getElementById('paidBtn');
+            
+            const amountInputContainer = document.getElementById('amount-input-container');
+            const amountInput = document.getElementById('amount-input');
+            
+            const qrSection = document.getElementById('qr-section');
+            const qrCodeElement = document.getElementById('qr-code');
+            const noQrMessage = document.getElementById('no-qr-message');
+            
+            // State
+            let currentPaymentType = 'locket-gold';
+            let currentAmount = '30000';
+            let selectedBank = {
+                bank: 'mbbank',
+                account: '090695',
+                name: 'NGUYEN HOANG VINH',
+                branch: 'HÀ NỘI',
+                displayName: 'MB BANK - TÀI KHOẢN CHÍNH'
+            };
+            
+            // Payment Option Selection
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    document.querySelectorAll('.payment-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Update current payment type
+                    currentPaymentType = this.getAttribute('data-type');
+                    
+                    // Show/hide amount input based on selection
+                    if (currentPaymentType === 'free') {
+                        amountInputContainer.classList.add('active');
+                        // Focus on input field
+                        amountInput.focus();
+                        // Enable continue button only if amount is entered
+                        toBankStepBtn.disabled = true;
+                    } else {
+                        amountInputContainer.classList.remove('active');
+                        // Set amount based on data-attribute
+                        currentAmount = this.getAttribute('data-amount');
+                        toBankStepBtn.disabled = false;
+                    }
+                });
+            });
+
+            // Amount input change handler
+            amountInput.addEventListener('input', function() {
+                currentAmount = this.value;
+                // Enable continue button if amount is valid
+                toBankStepBtn.disabled = !currentAmount || currentAmount <= 0;
+            });
+
+            // Bank Option Selection
+            document.querySelectorAll('.bank-option:not(.disabled)').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    document.querySelectorAll('.bank-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Update selected bank
+                    selectedBank = {
+                        bank: this.getAttribute('data-bank'),
+                        account: this.getAttribute('data-account'),
+                        name: this.getAttribute('data-name'),
+                        branch: this.getAttribute('data-branch'),
+                        displayName: this.querySelector('.bank-name').textContent.trim()
+                    };
+                });
+            });
+
+            // Navigation between steps
+            toBankStepBtn.addEventListener('click', function() {
+                if (currentPaymentType === 'free' && (!currentAmount || currentAmount <= 0)) {
+                    return; // Should not happen as button is disabled
+                }
+                
+                // Move to bank selection step
+                paymentSection.classList.remove('active');
+                bankSection.classList.add('active');
+                
+                // Update step indicator
+                step1.classList.remove('active');
+                step2.classList.add('active');
+            });
+
+            backToPaymentBtn.addEventListener('click', function() {
+                // Move back to payment selection
+                bankSection.classList.remove('active');
+                paymentSection.classList.add('active');
+                
+                // Update step indicator
+                step2.classList.remove('active');
+                step1.classList.add('active');
+            });
+
+            toInvoiceStepBtn.addEventListener('click', function() {
+                // Update invoice with current selection
+                updateInvoice(currentPaymentType, currentAmount, selectedBank);
+                
+                // Move to invoice step
+                bankSection.classList.remove('active');
+                invoiceSection.classList.add('active');
+                
+                // Update step indicator
+                step2.classList.remove('active');
+                step3.classList.add('active');
+            });
+
+            backToBankBtn.addEventListener('click', function() {
+                // Move back to bank selection
+                invoiceSection.classList.remove('active');
+                bankSection.classList.add('active');
+                
+                // Update step indicator
+                step3.classList.remove('active');
+                step2.classList.add('active');
+            });
+
+            newTransactionBtn.addEventListener('click', function() {
+                // Reset to initial state
+                invoiceSection.classList.remove('active');
+                paymentSection.classList.add('active');
+                
+                // Reset step indicator
+                step3.classList.remove('active');
+                step1.classList.add('active');
+                
+                // Reset form
+                document.querySelectorAll('.payment-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                document.querySelector('.payment-option[data-type="locket-gold"]').classList.add('active');
+                
+                amountInputContainer.classList.remove('active');
+                amountInput.value = '';
+                
+                currentPaymentType = 'locket-gold';
+                currentAmount = '30000';
+            });
+
+            // Copy account number
+            copyAccountBtn.addEventListener('click', function() {
+                copyToClipboard(selectedBank.account, 'số tài khoản');
+            });
+
+            // Paid button - send Telegram notification
+            paidBtn.addEventListener('click', function() {
+                const transactionId = document.getElementById('transaction-id').textContent;
+                const transactionTime = document.getElementById('transaction-time').textContent;
+                const amount = document.getElementById('invoice-amount').textContent;
+                const paymentType = document.getElementById('transaction-type').textContent;
+                
+                // Send notification to Telegram
+                sendTelegramNotification(paymentType, amount, selectedBank, transactionId, transactionTime);
+                
+                // Show success message
+                showNotification('Đã gửi xác nhận thanh toán! Cảm ơn bạn!');
+                
+                // Disable the button to prevent multiple clicks
+                paidBtn.disabled = true;
+                paidBtn.innerHTML = '<i class="fas fa-check"></i> ĐÃ XÁC NHẬN';
+                paidBtn.style.background = '#9e9e9e';
+            });
+
+            // Function to update invoice information
+            function updateInvoice(paymentType, amount, bank) {
+                const transactionType = document.getElementById('transaction-type');
+                const invoiceAmount = document.getElementById('invoice-amount');
+                const invoiceContent = document.getElementById('invoice-content');
+                const selectedBankName = document.getElementById('selected-bank-name');
+                const selectedAccount = document.getElementById('selected-account');
+                const selectedAccountName = document.getElementById('selected-account-name');
+                const selectedBranch = document.getElementById('selected-branch');
+                
+                let content = '';
+                let typeName = '';
+                
+                // Format amount with commas
+                const formattedAmount = amount ? parseInt(amount).toLocaleString('vi-VN') : '0';
+                invoiceAmount.textContent = `${formattedAmount} VND`;
+                
+                // Set content and type name based on payment type
+                switch(paymentType) {
+                    case 'locket-gold':
+                        content = 'LKGold_0397772987';
+                        typeName = 'Locket Gold';
+                        break;
+                    case 'free':
+                        content = 'Thanh toan tu do';
+                        typeName = 'Thanh Toán Tự Do';
+                        break;
+                    case 'crypto':
+                        content = 'Crypto_0397772987';
+                        typeName = 'Nạp Tiền Điện Tử';
+                        break;
+                    case 'other':
+                        content = 'Giao dich khac';
+                        typeName = 'Giao Dịch Khác';
+                        break;
+                }
+                
+                transactionType.textContent = typeName;
+                invoiceContent.textContent = content;
+                
+                // Update bank information
+                selectedBankName.textContent = bank.displayName;
+                selectedAccount.textContent = bank.account;
+                selectedAccountName.textContent = bank.name;
+                selectedBranch.textContent = bank.branch || 'Không xác định';
+                
+                // Update QR Code
+                updateQRCode(amount, content, bank);
+                
+                // Update transaction ID and time
+                document.getElementById('transaction-id').textContent = `#HV2023${Math.floor(1000 + Math.random() * 9000)}`;
+                document.getElementById('transaction-time').textContent = getCurrentDateTime();
+                
+                // Reset paid button
+                paidBtn.disabled = false;
+                paidBtn.innerHTML = '<i class="fas fa-check-circle"></i> ĐÃ THANH TOÁN';
+                paidBtn.style.background = '';
+            }
+
+            // Function to update QR code using SePay API
+            function updateQRCode(amount, content, bank) {
+                // If Zalo Pay, show message instead of QR code
+                if (bank.bank === 'zalopay') {
+                    qrCodeElement.style.display = 'none';
+                    noQrMessage.style.display = 'block';
+                    return;
+                }
+                
+                // For other banks, show QR code
+                qrCodeElement.style.display = 'block';
+                noQrMessage.style.display = 'none';
+                
+                // Build QR code URL with SePay API
+                let qrURL = `https://qr.sepay.vn/img?acc=${bank.account}&bank=${bank.bank.toUpperCase()}&des=${encodeURIComponent(content)}&template=compact`;
+                
+                // Add amount if provided and greater than 0
+                if (amount && amount > 0) {
+                    qrURL += `&amount=${amount}`;
+                }
+                
+                qrCodeElement.innerHTML = `<img src="${qrURL}" alt="QR Code for ${content}" style="width: 100%; height: 100%;">`;
+            }
+
+            // Function to get current date and time
+            function getCurrentDateTime() {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = now.getFullYear();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            }
+
+            // Function to send Telegram notification
+            function sendTelegramNotification(paymentType, amount, bank, transactionId, transactionTime) {
+                // Thay thế bằng token bot Telegram của bạn và chat_id
+                const botToken = '7696765215:AAFpmqj1rD34uEgrho3T-97wnTeZcxJeWlo';
+                const chatId = '6369371709';
+                
+                const message = `✅ THANH TOÁN THÀNH CÔNG
+────────────────
+🆔 Mã giao dịch: ${transactionId}
+💰 Số tiền: ${amount}
+📋 Loại thanh toán: ${paymentType}
+🏦 Ngân hàng: ${bank.displayName}
+👤 Chủ tài khoản: ${bank.name}
+📱 Số tài khoản: ${bank.account}
+⏰ Thời gian: ${transactionTime}
+────────────────
+Cảm ơn bạn đã sử dụng dịch vụ!`;
+                
+                // Gửi dữ liệu đến Telegram API
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Đã gửi thông báo đến Telegram:', data);
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi thông báo Telegram:', error);
+                });
+            }
+        });
+        
+        function copyToClipboard(text, description) {
+            const notification = document.getElementById('copyNotification');
+            
+            navigator.clipboard.writeText(text).then(() => {
+                notification.innerHTML = `<i class="fas fa-check-circle"></i> Đã sao chép ${description}!`;
+                notification.style.opacity = '1';
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                notification.innerHTML = `<i class="fas fa-times-circle"></i> Lỗi khi sao chép!`;
+                notification.style.background = 'var(--danger)';
+                notification.style.opacity = '1';
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.style.background = 'var(--success)';
+                    }, 300);
+                }, 2000);
+                
+                // Fallback for older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    notification.innerHTML = `<i class="fas fa-check-circle"></i> Đã sao chép ${description}!`;
+                    notification.style.opacity = '1';
+                    notification.style.background = 'var(--success)';
+                    
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('copyNotification');
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            notification.style.background = 'var(--success)';
+            notification.style.opacity = '1';
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
