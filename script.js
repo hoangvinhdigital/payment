@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const TELEGRAM_BOT_TOKEN = '7696765215:AAFpmqj1rD34uEgrho3T-97wnTeZcxJeWlo';
     const TELEGRAM_CHAT_ID = '6369371709';
 
-    // ----- DỮ LIỆU TÀI KHOẢN NGÂN HÀNG (Đã cập nhật) -----
+    // ----- DỮ LIỆU TÀI KHOẢN NGÂN HÀNG -----
     const accountsData = {
         'mb_main': {
             bankCode: 'MB',
@@ -66,13 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
     const copyStkBtn = document.getElementById('copy-stk-btn');
     const copyMemoBtn = document.getElementById('copy-memo-btn');
-
+    
     // ----- HÀM TIỆN ÍCH -----
 
-    // Hàm định dạng số tiền
     const formatCurrency = (number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
 
-    // Hàm hiển thị thông báo toast
     const showToast = (message) => {
         const toast = document.getElementById('toast-notification');
         toast.textContent = message;
@@ -82,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     };
 
-    // Hàm sao chép
     const copyToClipboard = (text, message) => {
         navigator.clipboard.writeText(text).then(() => {
             showToast(message);
@@ -92,17 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Hàm tạo mã giao dịch
     const generateTransactionId = () => `HV${new Date().getTime().toString().slice(-7)}`;
-
-    // Hàm tạo thời gian
     const getTransactionTime = () => new Date().toLocaleString('vi-VN', { hour12: false });
 
-    // Hàm điều hướng bước
     const navigateToStep = (stepNumber) => {
         state.currentStep = stepNumber;
         
-        // Cập nhật hiển thị bước
         steps.forEach(step => {
             step.classList.remove('active');
             if (parseInt(step.dataset.step) === stepNumber) {
@@ -110,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Cập nhật chỉ báo bước
         stepItems.forEach(item => {
             const itemStep = parseInt(item.dataset.step);
             item.classList.remove('active', 'completed');
@@ -123,21 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----- LOGIC BƯỚC 1: CHỌN THANH TOÁN -----
-
     optionsContainer.addEventListener('click', (e) => {
         const clickedCard = e.target.closest('.option-card');
         if (!clickedCard) return;
 
-        // Cập nhật UI
         optionCards.forEach(card => card.classList.remove('active'));
         clickedCard.classList.add('active');
 
-        // Cập nhật state
         state.paymentType = clickedCard.dataset.type;
         state.amount = parseInt(clickedCard.dataset.amount);
         state.isCustom = clickedCard.dataset.custom === 'true';
 
-        // Hiển thị/ẩn ô nhập số tiền
         if (state.isCustom) {
             customAmountGroup.classList.remove('hidden');
             customAmountInput.value = '';
@@ -150,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     step1NextBtn.addEventListener('click', () => {
-        // Validate
         if (state.isCustom) {
             const amount = parseInt(customAmountInput.value);
             if (isNaN(amount) || amount <= 0) {
@@ -164,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----- LOGIC BƯỚC 2: CHỌN TÀI KHOẢN -----
-
     accountListContainer.addEventListener('change', () => {
         const selectedRadio = document.querySelector('input[name="bank-account"]:checked');
         if (selectedRadio) {
@@ -181,39 +166,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         step2Error.textContent = '';
-        generateReceipt(); // Tạo hóa đơn
+        generateReceipt();
         navigateToStep(3);
     });
 
-    // ----- LOGIC BƯỚC 3: HÓA ĐƠN (Đã cập nhật) -----
-
+    // ----- LOGIC BƯỚC 3: HÓA ĐƠN -----
     const generateReceipt = () => {
-        // Tạo mã và thời gian mới
         state.transactionId = generateTransactionId();
         state.transactionTime = getTransactionTime();
-
         const account = accountsData[state.selectedAccountKey];
 
-        // 1. Điền thông tin giao dịch
         document.getElementById('receipt-txn-id').textContent = state.transactionId;
         document.getElementById('receipt-time').textContent = state.transactionTime;
         document.getElementById('receipt-type').textContent = state.paymentType;
         document.getElementById('receipt-amount').textContent = formatCurrency(state.amount);
 
-        // 2. Điền thông tin ngân hàng (Đã cập nhật)
         const iconEl = document.getElementById('receipt-bank-icon');
-        // Gán cả class icon và class màu
         iconEl.className = `${account.iconClass} ${account.colorClass}`; 
 
         document.getElementById('receipt-bank-name').textContent = account.bankName;
         document.getElementById('receipt-account-owner').textContent = account.owner;
         document.getElementById('receipt-account-number').textContent = account.number;
         
-        // 3. Điền nội dung
-        const memo = state.transactionId; // Nội dung là mã giao dịch
+        const memo = state.transactionId;
         document.getElementById('receipt-memo').textContent = memo;
 
-        // 4. Tạo mã QR
         const qrImg = document.getElementById('receipt-qr-img');
         const qrNotAvailable = document.getElementById('qr-not-available');
         
@@ -223,16 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
             qrImg.classList.remove('hidden');
             qrNotAvailable.classList.add('hidden');
         } else {
-            // Ẩn QR cho ZaloPay hoặc các loại khác
             qrImg.classList.add('hidden');
             qrNotAvailable.classList.remove('hidden');
         }
     };
 
-    // Nút quay lại B3
     step3BackBtn.addEventListener('click', () => navigateToStep(2));
 
-    // Nút sao chép
     copyStkBtn.addEventListener('click', () => {
         const accountNumber = document.getElementById('receipt-account-number').textContent;
         copyToClipboard(accountNumber, 'Đã sao chép STK!');
@@ -243,14 +217,16 @@ document.addEventListener('DOMContentLoaded', () => {
         copyToClipboard(memo, 'Đã sao chép nội dung!');
     });
 
-    // Nút ĐÃ THANH TOÁN (Gửi Telegram)
+    // ----- Nút ĐÃ THANH TOÁN (Đã sửa lỗi) -----
+
+    // 1. Tạo AbortController để quản lý trình nghe sự kiện // <-- FIX
+    const paymentController = new AbortController();
+
     confirmPaymentBtn.addEventListener('click', async () => {
         confirmPaymentBtn.disabled = true;
         confirmPaymentBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ĐANG GỬI...';
 
         const account = accountsData[state.selectedAccountKey];
-
-        // Định dạng tin nhắn
         const message = `
 ✅ THANH TOÁN THÀNH CÔNG
 ────────────────
@@ -264,38 +240,35 @@ document.addEventListener('DOMContentLoaded', () => {
 ────────────────
 Cảm ơn bạn đã sử dụng dịch vụ!
         `;
-
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: TELEGRAM_CHAT_ID,
-                    text: message.trim() // Xóa khoảng trắng thừa
+                    text: message.trim()
                 })
             });
-
             const data = await response.json();
 
             if (data.ok) {
-                
-                // ===== THÊM DÒNG NÀY ĐỂ PHÁT ÂM THANH "TING" =====
                 new Audio('https://hoagzih.github.io/payment/ting.mp3').play();
-                // =================================================
-
                 showToast('Đã gửi thông báo thành công!');
                 confirmPaymentBtn.innerHTML = '<i class="fa-solid fa-check"></i> ĐÃ GỬI THÀNH CÔNG';
                 
-                // Thay đổi nút thành "Tạo giao dịch mới"
                 setTimeout(() => {
                     confirmPaymentBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> TẠO GIAO DỊCH MỚI';
                     confirmPaymentBtn.disabled = false;
-                    confirmPaymentBtn.style.background = '#6c757d'; // Màu xám
-                    confirmPaymentBtn.onclick = () => location.reload(); // Tải lại trang
+                    confirmPaymentBtn.style.background = '#6c757d';
+
+                    // 2. Hủy trình nghe sự kiện "gửi Telegram" // <-- FIX
+                    paymentController.abort(); 
+                    
+                    // 3. Gán hành động "tải lại trang" // <-- FIX
+                    confirmPaymentBtn.onclick = () => location.reload(); 
+                    
                 }, 2000);
 
             } else {
@@ -307,12 +280,9 @@ Cảm ơn bạn đã sử dụng dịch vụ!
             confirmPaymentBtn.disabled = false;
             confirmPaymentBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ĐÃ THANH TOÁN';
         }
-    });
+    }, { signal: paymentController.signal }); // 1. Gán signal cho trình nghe sự kiện // <-- FIX
 
     // ----- KHỞI TẠO -----
-    // Đảm bảo trạng thái ban đầu là chính xác
     navigateToStep(1); 
-    // Thiết lập tài khoản mặc định
     document.querySelector('input[name="bank-account"][value="mb_main"]').checked = true;
-
 });
