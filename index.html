@@ -58,26 +58,47 @@
             touch-action: manipulation;
         }
 
-        /* 3D Core Utilities */
+        /* 3D Core Utilities - FIXED FOR MOBILE */
         .perspective-container {
             perspective: 1200px;
+            -webkit-perspective: 1200px;
         }
         
         .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); /* Nhanh hơn chút cho mobile */
+            -webkit-transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* Fix iOS rendering */
+            will-change: transform;
         }
 
         .card-face {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            /* Quan trọng: Ẩn mặt sau */
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
-            transform-style: preserve-3d;
-            /* Fix lỗi nháy trên iOS */
+            /* Hack fix lỗi iOS z-index */
+            transform: translate3d(0,0,0); 
             -webkit-transform: translate3d(0,0,0);
+            border-radius: 32px;
         }
 
-        .rotate-y-180 {
+        /* Class xoay cho mặt sau (Mặc định xoay 180 độ) */
+        .face-back {
+            transform: rotateY(180deg) translateZ(1px); /* translateZ để tránh dính mặt */
+            -webkit-transform: rotateY(180deg) translateZ(1px);
+        }
+
+        /* Class xoay cho container khi kích hoạt lật */
+        .flipped {
             transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
         }
 
         /* Custom Scrollbar - Ẩn thanh cuộn nhưng vẫn cuộn được */
@@ -89,34 +110,29 @@
             scrollbar-width: none;
         }
 
-        /* Glassmorphism Optimization - Đã cập nhật cho hiệu ứng kính rõ hơn */
+        /* Glassmorphism Optimization */
         .glass-panel {
-            /* Nền pha trộn giữa đen mờ và gradient trắng nhẹ để tạo bề mặt kính */
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(20, 20, 20, 0.4) 100%);
-            
-            /* Blur mạnh và tăng độ bão hòa màu nền */
             backdrop-filter: blur(30px) saturate(160%);
             -webkit-backdrop-filter: blur(30px) saturate(160%);
-            
-            /* Viền kính: viền trên sáng hơn để giả lập ánh sáng chiếu vào */
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
             border-left: 1px solid rgba(255, 255, 255, 0.15);
-            
-            box-shadow: 
-                0 8px 32px 0 rgba(0, 0, 0, 0.5),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.05); /* Inner stroke */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            /* Fix overflow rounded corners on Safari */
+            mask-image: -webkit-radial-gradient(white, black);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
 
-        /* Hiệu ứng nền - Tăng độ đậm để hiện rõ qua kính */
+        /* Hiệu ứng nền */
         .bg-blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px); /* Blur mượt hơn */
-            opacity: 0.6; /* Tăng từ 0.3 lên 0.6 */
+            filter: blur(80px);
+            opacity: 0.6;
             animation: float 10s infinite ease-in-out;
             will-change: transform;
-            mix-blend-mode: screen; /* Giúp màu rực rỡ hơn trên nền đen */
+            mix-blend-mode: screen;
         }
 
         @keyframes float {
@@ -125,10 +141,7 @@
         }
 
         .btn-shimmer {
-            background: linear-gradient(to right, 
-                rgba(255,255,255,0) 0%, 
-                rgba(255,255,255,0.15) 50%, 
-                rgba(255,255,255,0) 100%);
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
             background-size: 200% 100%;
             animation: shimmer 3s infinite linear;
         }
@@ -151,23 +164,20 @@
         <div class="bg-blob bg-indigo-600 w-96 h-96 top-0 left-0 -translate-x-1/3 -translate-y-1/3"></div>
         <div class="bg-blob bg-fuchsia-600 w-80 h-80 bottom-0 right-0 translate-x-1/3 translate-y-1/3 animation-delay-2000"></div>
         <div class="bg-blob bg-cyan-600 w-64 h-64 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30"></div>
-        
-        <!-- Noise texture overlay -->
         <div class="absolute inset-0 opacity-[0.07]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
     </div>
 
     <!-- Main Card Container -->
-    <!-- Sử dụng h-[90dvh] để chiều cao linh hoạt theo màn hình điện thoại thực tế -->
     <div id="tilt-card" class="perspective-container w-full max-w-[380px] h-[92dvh] max-h-[800px] min-h-[550px] z-10 px-4 py-2">
         
         <!-- Flipper -->
-        <div id="card-inner" class="card-inner relative w-full h-full">
+        <div id="card-inner" class="card-inner">
 
             <!-- === FRONT FACE === -->
-            <div class="card-face absolute inset-0 w-full h-full">
+            <div class="card-face">
                 <div class="glass-panel w-full h-full rounded-[32px] flex flex-col overflow-hidden relative shadow-2xl">
                     
-                    <!-- Reflection Shine (New) -->
+                    <!-- Reflection Shine -->
                     <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
 
                     <!-- Header Section -->
@@ -218,7 +228,7 @@
                         <!-- JS Generated Items -->
                     </div>
 
-                    <!-- Footer (Safe Area handled) -->
+                    <!-- Footer -->
                     <div class="py-3 text-center border-t border-white/10 z-20 bg-black/20 backdrop-blur-xl shrink-0 pb-safe">
                         <p class="text-[9px] text-white/40 uppercase tracking-[0.25em] font-bold">Secure Payment Gate</p>
                     </div>
@@ -226,9 +236,9 @@
             </div>
 
             <!-- === BACK FACE (QR) === -->
-            <div class="card-face absolute inset-0 w-full h-full rotate-y-180">
+            <!-- Thêm class face-back -->
+            <div class="card-face face-back">
                 <div class="glass-panel w-full h-full rounded-[32px] flex flex-col relative overflow-hidden">
-                    <!-- Darker overlay for back face to make QR pop -->
                     <div class="absolute inset-0 bg-black/40 z-0"></div>
                     
                     <!-- Back Nav -->
@@ -250,7 +260,6 @@
                             <div class="relative bg-white/95 backdrop-blur-sm p-3 rounded-2xl shadow-2xl border border-white/20">
                                 <div class="w-48 h-48 sm:w-52 sm:h-52 relative overflow-hidden rounded-xl">
                                     <img id="qr-image" src="" alt="QR Code" class="w-full h-full object-contain">
-                                    <!-- Scan Line Animation -->
                                     <div class="absolute left-0 w-full h-[2px] bg-red-500/80 blur-[1px] shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-scan"></div>
                                 </div>
                             </div>
@@ -263,7 +272,6 @@
                                 <span id="qr-bank-name" class="text-xs font-bold tracking-wider text-white uppercase">BANK</span>
                             </div>
                             
-                            <!-- Số tài khoản to rõ -->
                             <div class="relative bg-white/5 rounded-xl p-3 border border-white/10 mb-2 group active:bg-white/10 transition-colors cursor-pointer hover:border-white/30" onclick="document.getElementById('qr-copy-btn').click()">
                                 <h2 id="qr-account-number" class="text-xl sm:text-2xl font-mono font-bold text-white tracking-widest text-center select-all drop-shadow-md">
                                     000000
@@ -276,7 +284,6 @@
 
                         <!-- Actions -->
                         <div class="mt-auto pt-6 flex flex-col w-full gap-3 pb-safe">
-                            <!-- Copy Button -->
                             <button id="qr-copy-btn" class="relative w-full py-3.5 rounded-xl bg-indigo-600 text-white font-bold tracking-wide shadow-lg overflow-hidden btn-shimmer active:scale-[0.98] transition-transform border border-white/10">
                                 <span class="relative z-10 flex items-center justify-center gap-2 text-sm">
                                     <i data-lucide="copy" width="16" height="16"></i>
@@ -284,7 +291,6 @@
                                 </span>
                             </button>
 
-                            <!-- Download Button -->
                             <button id="qr-download-btn" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/80 font-medium active:bg-white/10 active:scale-[0.98] hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm backdrop-blur-sm">
                                 <i data-lucide="download" width="16" height="16"></i>
                                 Lưu ảnh QR
@@ -297,7 +303,7 @@
         </div>
     </div>
 
-    <!-- Toast Notification (Top position for better mobile visibility) -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-5 py-3 rounded-full bg-[#202020]/95 backdrop-blur-xl border border-white/10 shadow-2xl -translate-y-24 opacity-0 transition-all duration-300 z-[100] min-w-[200px] justify-center">
         <div class="p-1 rounded-full bg-green-500/20 text-green-400">
             <i data-lucide="check-circle-2" width="16" height="16"></i>
@@ -307,7 +313,6 @@
 
     <script>
         // --- DATA SETUP ---
-        // Lưu ý: Đổi tên accountName theo ý bạn
         const BANKS = [
             {
                 id: 'mb1',
@@ -315,8 +320,7 @@
                 accountName: 'NGUYEN HOANG VINH',
                 number: '090695',
                 color: 'from-blue-600 to-indigo-600',
-                icon: 'landmark', // Icon tòa nhà ngân hàng
-                // Dùng API VietQR để tạo QR động chuẩn xác
+                icon: 'landmark',
                 qr: 'https://img.vietqr.io/image/MB-090695-compact2.png?amount=&addInfo=&accountName=NGUYEN%20HOANG%20VINH'
             },
             {
@@ -335,7 +339,6 @@
                 number: '0397772987',
                 color: 'from-pink-600 to-rose-500',
                 icon: 'smartphone',
-                // Momo thường cần QR riêng, đây là link demo VietQR cho Momo (nếu hỗ trợ) hoặc dùng ảnh tĩnh
                 qr: 'https://img.vietqr.io/image/MOMO-0397772987-compact2.png' 
             },
             {
@@ -345,7 +348,7 @@
                 number: '0397772987',
                 color: 'from-blue-400 to-cyan-500',
                 icon: 'qr-code',
-                qr: 'https://img.vietqr.io/image/970454-99ZP25308M37546289-compact2.png' // Demo ZaloPay ID
+                qr: 'https://img.vietqr.io/image/970454-99ZP25308M37546289-compact2.png'
             }
         ];
 
@@ -364,7 +367,6 @@
                     
                     <div class="relative p-3.5 flex items-center justify-between">
                         <div class="flex items-center gap-3.5 min-w-0">
-                            <!-- Icon Box -->
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${bank.color} flex items-center justify-center shadow-lg text-white shrink-0 ring-1 ring-white/10">
                                 <i data-lucide="${bank.icon}" width="20" height="20"></i>
                             </div>
@@ -384,7 +386,6 @@
                 </div>
             `).join('');
             
-            // Re-init icons
             if (window.lucide) lucide.createIcons();
         }
 
@@ -392,44 +393,37 @@
             currentBank = BANKS.find(b => b.id === id);
             if (!currentBank) return;
 
-            // Haptic feedback nhẹ
             vibrate(10);
 
-            // Update Back Face Data
             document.getElementById('qr-image').src = currentBank.qr;
             document.getElementById('qr-bank-name').innerText = currentBank.name;
             document.getElementById('qr-account-number').innerText = currentBank.number;
             document.getElementById('qr-account-name').innerText = currentBank.accountName;
             
-            // Update Theme Colors
             const glow = document.getElementById('qr-glow');
             const btn = document.getElementById('qr-copy-btn');
             
             glow.className = `absolute -inset-2 bg-gradient-to-tr opacity-30 blur-2xl transition-all duration-500 rounded-full ${currentBank.color}`;
             btn.className = `relative w-full py-3.5 rounded-xl bg-gradient-to-r ${currentBank.color} text-white font-bold tracking-wide shadow-lg overflow-hidden btn-shimmer active:scale-[0.98] transition-transform border border-white/20`;
 
-            // Bind Actions
-            // Clear old listeners to prevent duplicates
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
             newBtn.onclick = () => copyText(currentBank.number, `số TK ${currentBank.name}`);
             
-            // Download logic
             const downBtn = document.getElementById('qr-download-btn');
             const newDownBtn = downBtn.cloneNode(true);
             downBtn.parentNode.replaceChild(newDownBtn, downBtn);
             newDownBtn.onclick = () => downloadQR(currentBank.qr, currentBank.name);
 
-            // Flip Animation
-            cardInner.classList.add('rotate-y-180');
+            // Cập nhật logic Flip
+            cardInner.classList.add('flipped');
             
-            // Re-init icons inside dynamic content if needed
             if (window.lucide) lucide.createIcons();
         }
 
         function flipBack() {
             vibrate(10);
-            cardInner.classList.remove('rotate-y-180');
+            cardInner.classList.remove('flipped');
         }
 
         // --- UTILS ---
@@ -438,7 +432,6 @@
         }
 
         function copyText(text, label) {
-            // Giải pháp Copy tối ưu cho Mobile (tránh lỗi trên Zalo/Facebook Webview)
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
                     showToast(`Đã sao chép ${label}`);
@@ -450,7 +443,6 @@
         }
 
         function fallbackCopy(text, label) {
-            // Tạo textarea ẩn để copy thủ công
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
@@ -470,11 +462,10 @@
         }
 
         function downloadQR(url, bankName) {
-            // Tạo link tải giả lập
             const a = document.createElement('a');
             a.href = url;
             a.download = `QR-${bankName}-HoangVinh.png`;
-            a.target = '_blank'; // Quan trọng cho trình duyệt in-app
+            a.target = '_blank';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -498,7 +489,6 @@
         }
 
         // --- 3D TILT EFFECT (DESKTOP ONLY) ---
-        // Chỉ kích hoạt nếu thiết bị có chuột (không phải cảm ứng) để tránh lag trên mobile
         if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
             const cardContainer = document.getElementById('tilt-card');
             
@@ -506,7 +496,6 @@
                 const x = (window.innerWidth / 2 - e.pageX) / 40; 
                 const y = (window.innerHeight / 2 - e.pageY) / 40;
                 
-                // Giới hạn góc nghiêng nhẹ hơn
                 const clampX = Math.max(-8, Math.min(8, x));
                 const clampY = Math.max(-8, Math.min(8, y));
 
@@ -519,7 +508,6 @@
         }
 
         // --- INIT ---
-        // Tự động thêm CSS Animation vào head
         const styleSheet = document.createElement("style");
         styleSheet.innerText = `
             @keyframes fade-in-up {
