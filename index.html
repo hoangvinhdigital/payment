@@ -333,15 +333,6 @@
                 qr: 'https://img.vietqr.io/image/MB-596783-compact2.png?amount=&addInfo=&accountName=NGUYEN%20HOANG%20VINH'
             },
             {
-                id: 'momo',
-                name: 'Momo',
-                accountName: 'NGUYEN HOANG VINH',
-                number: '0397772987',
-                color: 'from-pink-600 to-rose-500',
-                icon: 'smartphone',
-                qr: 'https://img.vietqr.io/image/MOMO-0397772987-compact2.png' 
-            },
-            {
                 id: 'zalopay',
                 name: 'ZaloPay',
                 accountName: 'NGUYEN HOANG VINH',
@@ -349,6 +340,16 @@
                 color: 'from-blue-400 to-cyan-500',
                 icon: 'qr-code',
                 qr: 'https://img.vietqr.io/image/970454-99ZP25308M37546289-compact2.png'
+            },
+            {
+                id: 'momo',
+                name: 'Momo',
+                accountName: 'NGUYEN HOANG VINH',
+                number: '0397772987',
+                color: 'from-pink-600 to-rose-500',
+                icon: 'smartphone',
+                qr: 'https://img.vietqr.io/image/MOMO-0397772987-compact2.png',
+                maintenance: true // Added maintenance status
             }
         ];
 
@@ -358,33 +359,40 @@
         let currentBank = null;
 
         function renderBanks() {
-            bankList.innerHTML = BANKS.map((bank, idx) => `
-                <div onclick="showQR('${bank.id}')" 
-                     class="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 active:border-white/20 transition-all duration-300 active:scale-[0.98] cursor-pointer hover:bg-white/10 hover:shadow-lg hover:shadow-white/5"
+            bankList.innerHTML = BANKS.map((bank, idx) => {
+                const isMaintenance = bank.maintenance;
+                return `
+                <div onclick="${isMaintenance ? '' : `showQR('${bank.id}')`}" 
+                     class="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 ${isMaintenance ? 'opacity-50 cursor-not-allowed grayscale' : 'active:border-white/20 active:scale-[0.98] cursor-pointer hover:bg-white/10 hover:shadow-lg hover:shadow-white/5'} transition-all duration-300"
                      style="animation: fade-in-up 0.5s ease-out ${idx * 0.1}s backwards">
                     
-                    <div class="absolute inset-0 bg-gradient-to-r ${bank.color} opacity-0 group-active:opacity-10 transition-opacity duration-300"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r ${bank.color} opacity-0 ${isMaintenance ? '' : 'group-active:opacity-10'} transition-opacity duration-300"></div>
                     
                     <div class="relative p-3.5 flex items-center justify-between">
                         <div class="flex items-center gap-3.5 min-w-0">
+                            <!-- Icon Box -->
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${bank.color} flex items-center justify-center shadow-lg text-white shrink-0 ring-1 ring-white/10">
                                 <i data-lucide="${bank.icon}" width="20" height="20"></i>
                             </div>
                             
                             <div class="flex flex-col min-w-0">
-                                <span class="text-white font-bold text-sm truncate group-hover:text-white transition-colors">${bank.name}</span>
-                                <div class="flex items-center gap-2 text-indigo-200/70 group-hover:text-indigo-100 transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-white font-bold text-sm truncate ${isMaintenance ? '' : 'group-hover:text-white'} transition-colors">${bank.name}</span>
+                                    ${isMaintenance ? '<span class="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-500 text-[10px] font-bold border border-yellow-500/30">BẢO TRÌ</span>' : ''}
+                                </div>
+                                <div class="flex items-center gap-2 text-indigo-200/70 ${isMaintenance ? '' : 'group-hover:text-indigo-100'} transition-colors">
                                     <span class="font-mono text-xs tracking-wider opacity-80">${bank.number}</span>
                                 </div>
                             </div>
                         </div>
 
+                        ${!isMaintenance ? `
                         <div class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-white/30 group-hover:bg-white/20 group-hover:text-white transition-all">
                             <i data-lucide="chevron-right" width="14" height="14"></i>
-                        </div>
+                        </div>` : ''}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             
             if (window.lucide) lucide.createIcons();
         }
